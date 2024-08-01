@@ -8,7 +8,7 @@ const api = axios.create({
 })
 
 // Axios request interceptor to add the Authorization header to each request
-api.interceptor.request.use(
+api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem(ACCESS_TOKEN);
         if(token){
