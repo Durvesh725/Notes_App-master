@@ -2,8 +2,8 @@ import { useState } from "react";
 import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
-import "../styles/Form.css"
-// import LoadingIndicator from "./LoadingIndicator";
+import "../styles/Form.css";
+import LoadingIndicator from "./LoadingIndicator";
 
 function Form({ route, method }) {
     const [username, setUsername] = useState("");
@@ -18,45 +18,49 @@ function Form({ route, method }) {
         e.preventDefault();
 
         try {
-            const res = await api.post(route, { username, password })
+            const res = await api.post(route, { username, password });
             if (method === "login") {
                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
-                navigate("/")
-            } 
-            else {
-                navigate("/login")
+                navigate("/");
+            } else {
+                navigate("/login");
             }
         } catch (error) {
-            alert(error)
+            alert(error);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="form-container">
-            <h1>{name}</h1>
-            <input
-                className="form-input"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-            />
-            <input
-                className="form-input"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-            />
-            {/* {loading && <LoadingIndicator />} */}
-            <button className="form-button" type="submit">
-                {name}
-            </button>
-        </form>
+        <div className="form-page">
+            <header className="header">
+                <h1>Welcome to Organized.</h1>
+            </header>
+            <form onSubmit={handleSubmit} className="form-container">
+                <h2>{name}</h2>
+                <input
+                    className="form-input"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Username"
+                />
+                <input
+                    className="form-input"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                />
+                {loading && <LoadingIndicator />}
+                <button className="form-button" type="submit">
+                    {name}
+                </button>
+            </form>
+        </div>
     );
 }
 
-export default Form
+export default Form;
