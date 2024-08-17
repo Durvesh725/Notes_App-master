@@ -1,15 +1,19 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import api from "../api.js";
+import api from "../api";
 import Note from "../components/Note";
+import UpdateNoteForm from "../components/UpdateNoteForm"; // Import the new component
 import "../styles/Home.css";
-import { ACCESS_TOKEN } from "../constants";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 
 function Home() {
   const [notes, setNotes] = useState([]);
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [username, setUsername] = useState("");
+  const [editingNote, setEditingNote] = useState(null); // State to handle editing
+  const navigate = useNavigate();
 
   useEffect(() => {
     getNotes();
@@ -22,23 +26,18 @@ function Home() {
       .then((res) => res.data)
       .then((data) => {
         setNotes(data);
-        console.log(data);
       })
       .catch((err) => alert(err));
   };
 
-  // getusername
   const decodeTokenAndFetchUser = () => {
     const token = localStorage.getItem(ACCESS_TOKEN);
     if (token) {
       const decoded = jwtDecode(token);
-      const userId = decoded.user_id;
-
       api
-        .get("/api/user/")  
+        .get("/api/user/")
         .then((res) => {
           setUsername(res.data.username);
-          // console.log(res.data.username);
         })
         .catch((err) => alert(err));
     }
@@ -67,6 +66,15 @@ function Home() {
       .catch((err) => alert(err));
   };
 
+  const handleUpdateNote = (updatedNote) => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) =>
+        note.id === updatedNote.id ? updatedNote : note
+      )
+    );
+    setEditingNote(null); // Close the edit form
+  };
+
   const getGreeting = () => {
     const currentHour = new Date().getHours();
     if (currentHour < 12) return "Good morning";
@@ -74,43 +82,65 @@ function Home() {
     return "Good evening";
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem(ACCESS_TOKEN);
+    localStorage.removeItem(REFRESH_TOKEN);
+    navigate("/login");
+  };
+
   return (
     <div className="home-container">
       <header className="header">
         <h1>{`${getGreeting()}, ${username}`}</h1>
+        <button className="logout-button" onClick={handleLogout}>Logout</button>
       </header>
-      <section className="form-section">
-        <h2>Create a new Note</h2>
-        <form onSubmit={createNote}>
-          <label htmlFor="title">Title</label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            required
-            onChange={(e) => setTitle(e.target.value)}
-            value={title}
-          />
-          <label htmlFor="content">Content</label>
-          <textarea
-            id="content"
-            name="content"
-            required
-            onChange={(e) => setContent(e.target.value)}
-            value={content}
-          ></textarea>
-          <input type="submit" value="Submit" />
-        </form>
-      </section>
-      <section className="notes-section">
-        {notes.length > 0 ? (
-          notes.map((note) => (
-            <Note note={note} onDelete={deleteNotes} key={note.id} />
-          ))
-        ) : (
-          <p>No notes available.</p>
-        )}
-      </section>
+      {editingNote ? (
+        <UpdateNoteForm
+          note={editingNote}
+          onUpdate={handleUpdateNote}
+          onCancel={() => setEditingNote(null)}
+        />
+      ) : (
+        <>
+          <section className="form-section">
+            <h2>Create a new Note</h2>
+            <form onSubmit={createNote}>
+              <label htmlFor="title">Title</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                required
+                onChange={(e) => setTitle(e.target.value)}
+                value={title}
+              />
+              <label htmlFor="content">Content</label>
+              <textarea
+                id="content"
+                name="content"
+                required
+                onChange={(e) => setContent(e.target.value)}
+                value={content}
+              ></textarea>
+              <input type="submit" value="Submit" />
+            </form>
+          </section>
+          <section className="notes-section">
+            {notes.length > 0 ? (
+              notes.map((note) => (
+                <Note
+                  note={note}
+                  onDelete={deleteNotes}
+                  onEdit={setEditingNote}
+                  key={note.id}
+                />
+              ))
+            ) : (
+              <p>No notes available.</p>
+            )}
+          </section>
+        </>
+      )}
     </div>
   );
 }
