@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import "../styles/Form.css";
 import LoadingIndicator from "./LoadingIndicator";
+import logo from "../assets/logo_white.png";
 
 function Form({ route, method }) {
   const [username, setUsername] = useState("");
@@ -34,7 +35,8 @@ function Form({ route, method }) {
   return (
     <div className="form-page">
       <header className="header">
-        <h1>Welcome to Organized.</h1>
+        <h2>Welcome to </h2>
+        <img src={logo} alt="Organized Logo" className="logo2" />
       </header>
       <form onSubmit={handleSubmit} className="form-container">
         <h2>{method === "login" ? "Login" : "Register"}</h2>

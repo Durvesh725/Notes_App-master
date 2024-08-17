@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../api";
+import "../styles/UpdateNoteForm.css"; 
 
 function UpdateNoteForm({ note, onUpdate, onCancel }) {
   const [title, setTitle] = useState(note.title);
@@ -13,10 +14,11 @@ function UpdateNoteForm({ note, onUpdate, onCancel }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     api
-      .put(`/api/notes/${note.id}/`, { title, content })
+      .put(`/api/notes/update/${note.id}/`, { title, content })
       .then((res) => {
         if (res.status === 200) {
           onUpdate(res.data);
+          alert("Note Updated successfully");
         } else {
           alert("Failed to update the note");
         }
@@ -45,10 +47,12 @@ function UpdateNoteForm({ note, onUpdate, onCancel }) {
           onChange={(e) => setContent(e.target.value)}
           required
         ></textarea>
-        <button type="submit">Update</button>
-        <button type="button" onClick={onCancel}>
-          Cancel
-        </button>
+        <div className="button-container">
+          <button className="update-button" type="submit">Update</button>
+          <button className="cancel-button" type="button" onClick={onCancel}>
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );

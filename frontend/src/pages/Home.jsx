@@ -3,16 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import api from "../api";
 import Note from "../components/Note";
-import UpdateNoteForm from "../components/UpdateNoteForm"; // Import the new component
+import UpdateNoteForm from "../components/UpdateNoteForm"; 
 import "../styles/Home.css";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import logoWhite from "../assets/logo_white_2.png"; 
 
 function Home() {
   const [notes, setNotes] = useState([]);
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [username, setUsername] = useState("");
-  const [editingNote, setEditingNote] = useState(null); // State to handle editing
+  const [editingNote, setEditingNote] = useState(null); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -72,7 +73,7 @@ function Home() {
         note.id === updatedNote.id ? updatedNote : note
       )
     );
-    setEditingNote(null); // Close the edit form
+    setEditingNote(null); 
   };
 
   const getGreeting = () => {
@@ -83,15 +84,21 @@ function Home() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem(ACCESS_TOKEN);
-    localStorage.removeItem(REFRESH_TOKEN);
-    navigate("/login");
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    if (confirmLogout) {
+      localStorage.removeItem(ACCESS_TOKEN);
+      localStorage.removeItem(REFRESH_TOKEN);
+      navigate("/login");
+    }
   };
 
   return (
     <div className="home-container">
       <header className="header">
-        <h1>{`${getGreeting()}, ${username}`}</h1>
+        <img src={logoWhite} alt="Logo" className="logo" />
+        <div className="header-content">
+          <h1>{`${getGreeting()}, ${username}`}</h1>
+        </div>
         <button className="logout-button" onClick={handleLogout}>Logout</button>
       </header>
       {editingNote ? (
